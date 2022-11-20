@@ -197,6 +197,10 @@ option(BUILD_OPENJPEG ON)
 option(BUILD_JASPER ON)
 option(BUILD_OPENEXR ON)
 
+option(BUILD_PERF_TESTS OFF)
+option(BUILD_DOCS OFF)
+option(BUILD_EXAMPLES OFF)
+
 set(OPENCV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/opencv" CACHE PATH "Stored the path to the opencv directory")
 set(OPENCV_INC "${OPENCV_DIR}/include")
 
