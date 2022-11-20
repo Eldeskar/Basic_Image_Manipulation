@@ -14,12 +14,6 @@ if(GIT_FOUND AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
     option(GIT_SUBMODULE "Check submodules durring build" ON)
     if(GIT_SUBMODULE)
         message(STATUS "Submodule update")
-        execute_process(COMMAND ${GIT_EXECUTABLE} submodule add https://github.com/libigl/eigen dependencies/eigen
-                            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-                            RESULT_VARIABLE GIT_SUBMOD_RESULT)
-        execute_process(COMMAND ${GIT_EXECUTABLE} submodule add https://github.com/opencv/opencv dependencies/opencv
-                            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-                            RESULT_VARIABLE GIT_SUBMOD_RESULT)
         execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
                             WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                             RESULT_VARIABLE GIT_SUBMOD_RESULT)
@@ -178,11 +172,7 @@ endif()
 # Adds eigen to the project 
 # --------------------------------------------------------------------------------
 
-option(BUILD_SHARED_LIBS "Build the static library" OFF)
-option(WITH_OPENMP "Enabling OPENMP" ON)
-
 set(EIGEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/eigen" CACHE PATH "Stored the path to the eigen directory")
-set(EIGEN_INC "${EIGEN_DIR}/include")
 
 add_subdirectory("${EIGEN_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/dependencies/eigen")
 
@@ -191,7 +181,21 @@ add_subdirectory("${EIGEN_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/dependencies/eigen"
 # --------------------------------------------------------------------------------
 
 option(BUILD_SHARED_LIBS "Build the static library" OFF)
-option(WITH_OPENMP "Enabling OPENMP" ON)
+option(WITH_PNG OFF)
+option(WITH_JPEG OFF)
+option(WITH_TIFF OFF)
+option(WITH_WEBP OFF)
+option(WITH_OPENJPEG OFF)
+option(WITH_JASPER OFF)
+option(WITH_OPENEXR OFF)
+
+option(BUILD_PNG ON)
+option(BUILD_JPEG ON)
+option(BUILD_TIFF ON)
+option(BUILD_WEBP ON)
+option(BUILD_OPENJPEG ON)
+option(BUILD_JASPER ON)
+option(BUILD_OPENEXR ON)
 
 set(OPENCV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/opencv" CACHE PATH "Stored the path to the opencv directory")
 set(OPENCV_INC "${OPENCV_DIR}/include")
@@ -247,7 +251,7 @@ target_link_libraries(${TEST_INSTANCE}
     PRIVATE
         ${OpenCV_LIBS}
         ${OPENMP_LIB}
-        Eigen3::Eigen
+        Eigen
     PUBLIC
         GTest::gtest_main
 )
@@ -317,13 +321,13 @@ target_link_libraries(${PROD_INSTANCE}
     PRIVATE
         ${OpenCV_LIBS}
         ${OPENMP_LIB}
-        Eigen3::Eigen
+        Eigen
     PUBLIC
         GTest::gtest_main
 )
 
 # --------------------------------------------------------------------------------
-# Copy the config.json file to the build directory
+# Copy the fata to the build directory
 # --------------------------------------------------------------------------------
 
 add_custom_command(TARGET ${PROD_INSTANCE} POST_BUILD
