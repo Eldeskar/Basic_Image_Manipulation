@@ -14,6 +14,9 @@ if(GIT_FOUND AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
     option(GIT_SUBMODULE "Check submodules durring build" ON)
     if(GIT_SUBMODULE)
         message(STATUS "Submodule update")
+        execute_process(COMMAND ${GIT_EXECUTABLE} submodule add https://github.com/libigl/eigen dependencies/eigen
+                            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                            RESULT_VARIABLE GIT_SUBMOD_RESULT)
         execute_process(COMMAND ${GIT_EXECUTABLE} submodule add https://github.com/opencv/opencv dependencies/opencv
                             WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                             RESULT_VARIABLE GIT_SUBMOD_RESULT)
@@ -161,13 +164,39 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 # --------------------------------------------------------------------------------
-# Adds opencv lite to the project 
+# Adds openMP  to the project 
 # --------------------------------------------------------------------------------
 
+set(OPENMP_LIB "")
+
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    set(OPENMP_LIB OpenMP::OpenMP_CXX FORCE)
+endif()
+
+# --------------------------------------------------------------------------------
+# Adds eigen to the project 
+# --------------------------------------------------------------------------------
+
+option(BUILD_SHARED_LIBS "Build the static library" OFF)
+option(WITH_OPENMP "Enabling OPENMP" ON)
+
+set(EIGEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/eigen" CACHE PATH "Stored the path to the eigen directory")
+set(EIGEN_INC "${EIGEN_DIR}/include")
+
+add_subdirectory("${EIGEN_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/dependencies/eigen")
+
+# --------------------------------------------------------------------------------
+# Adds opencv to the project 
+# --------------------------------------------------------------------------------
+
+option(BUILD_SHARED_LIBS "Build the static library" OFF)
+option(WITH_OPENMP "Enabling OPENMP" ON)
+
 set(OPENCV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/opencv" CACHE PATH "Stored the path to the opencv directory")
+set(OPENCV_INC "${OPENCV_DIR}/include")
 
 add_subdirectory("${OPENCV_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/dependencies/opencv")
-
 
 # --------------------------------------------------------------------------------
 # Defining the names of the test instance
@@ -207,6 +236,7 @@ target_include_directories(${TEST_INSTANCE}
     PUBLIC
         inc
         test/inc
+        ${OPENCV_INC}
 )
 
 # --------------------------------------------------------------------------------
@@ -216,6 +246,8 @@ target_include_directories(${TEST_INSTANCE}
 target_link_libraries(${TEST_INSTANCE}
     PRIVATE
         ${OpenCV_LIBS}
+        ${OPENMP_LIB}
+        Eigen3::Eigen
     PUBLIC
         GTest::gtest_main
 )
@@ -273,7 +305,7 @@ target_compile_definitions(${PROD_INSTANCE}
 target_include_directories(${PROD_INSTANCE}
 PUBLIC
     inc
-    test/inc
+    ${OPENCV_INC}
 )
 
 
@@ -284,8 +316,10 @@ PUBLIC
 target_link_libraries(${PROD_INSTANCE}
     PRIVATE
         ${OpenCV_LIBS}
+        ${OPENMP_LIB}
+        Eigen3::Eigen
     PUBLIC
-
+        GTest::gtest_main
 )
 
 # --------------------------------------------------------------------------------
