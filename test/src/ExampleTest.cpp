@@ -1,10 +1,10 @@
 #include "ExampleTest.h"
 
-void RingBufferTest::SetUp()
+void ExampleTest::SetUp()
 {
 }
 
-void RingBufferTest::TearDown()
+void ExampleTest::TearDown()
 {
 }
 

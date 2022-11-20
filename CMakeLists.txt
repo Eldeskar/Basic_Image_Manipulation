@@ -165,16 +165,8 @@ set(OPENMP_LIB "")
 
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
-    set(OPENMP_LIB OpenMP::OpenMP_CXX FORCE)
+    set(OPENMP_LIB OpenMP::OpenMP_CXX)
 endif()
-
-# --------------------------------------------------------------------------------
-# Adds eigen to the project 
-# --------------------------------------------------------------------------------
-
-set(EIGEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/eigen" CACHE PATH "Stored the path to the eigen directory")
-
-add_subdirectory("${EIGEN_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/dependencies/eigen")
 
 # --------------------------------------------------------------------------------
 # Adds opencv to the project 
@@ -197,6 +189,7 @@ option(BUILD_OPENJPEG ON)
 option(BUILD_JASPER ON)
 option(BUILD_OPENEXR ON)
 
+option(BUILD_TESTS ON)
 option(BUILD_PERF_TESTS OFF)
 option(BUILD_DOCS OFF)
 option(BUILD_EXAMPLES OFF)
@@ -255,7 +248,6 @@ target_link_libraries(${TEST_INSTANCE}
     PRIVATE
         ${OpenCV_LIBS}
         ${OPENMP_LIB}
-        Eigen
     PUBLIC
         GTest::gtest_main
 )
@@ -325,7 +317,6 @@ target_link_libraries(${PROD_INSTANCE}
     PRIVATE
         ${OpenCV_LIBS}
         ${OPENMP_LIB}
-        Eigen
     PUBLIC
         GTest::gtest_main
 )
